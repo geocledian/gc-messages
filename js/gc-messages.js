@@ -1,7 +1,7 @@
 /*
  Vue.js Geocledian messages component
  created: 2021-09-21, jsommer
- updated: 2021-09-21, jsommer
+ updated: 2021-10-15, jsommer
  version: 0.1
 */
 "use strict";
@@ -219,8 +219,15 @@ Vue.component('gc-messages', {
     },
     selectedParcelId(newValue, oldValue) {
       //get messages of current parcel
-      this.getParcelMessages(newValue);
+      if (this.gcWidgetCollapsed == false) {
+        this.getParcelMessages(newValue);
+      }
     },
+    gcWidgetCollapsed(newValue, oldValue) {
+      if (newValue == false) {
+        this.getParcelMessages(this.selectedParcelId);
+      }
+    }
   },
   methods: {  
     getApiUrl: function (endpoint) {
@@ -328,6 +335,6 @@ Vue.component('gc-messages', {
       let date = timestamp.split('T')[1];
 
       return date + '-' + time;
-    }
+    },
   }
 });
