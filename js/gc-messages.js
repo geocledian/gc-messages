@@ -9,9 +9,11 @@
 //language strings
 const gcMessagesLocales = {
   "en": {
-    "options": { "title": "Messages" },
-    "table": { 
-      "header": { 
+    "options": {
+      "title": "Messages"
+    },
+    "table": {
+      "header": {
         "timestamp": "Time",
         "code": "Code",
         "description": "Description",
@@ -22,9 +24,11 @@ const gcMessagesLocales = {
     },
   },
   "de": {
-    "options": { "title": "Ereignisse" },
-    "table": { 
-      "header": { 
+    "options": {
+      "title": "Ereignisse"
+    },
+    "table": {
+      "header": {
         "timestamp": "Zeit",
         "code": "Code",
         "description": "Beschreibung",
@@ -32,6 +36,21 @@ const gcMessagesLocales = {
         "priority": "Priorität",
       },
       "nodata": "Leider keine Ereignisse vorhanden!"
+    },
+  },
+  "lt": {
+    "options": {
+      "title": "Žinutės"
+    },
+    "table": {
+      "header": {
+        "timestamp": "Laikas",
+        "code": "Kodas",
+        "description": "Aprašymas",
+        "content": "Turinys",
+        "priority": "Prioritetas",
+      },
+      "nodata": "Atsiprašome, pranešimų nėra!"
     },
   },
 }
@@ -63,7 +82,7 @@ Vue.component('gc-messages', {
       type: Boolean,
       default: true
     },
-    gcSelectedParcelId: {      
+    gcSelectedParcelId: {
       type: Number,
       default: -1
     },
@@ -143,12 +162,17 @@ Vue.component('gc-messages', {
   data: function () {
     console.debug("parceldata! - data()");
     return {
-        messages: [],
-        lastSortOrder: false,
-        layoutCSSMap: { "alignment": {"vertical": "is-inline-block", "horizontal": "is-flex" }}
+      messages: [],
+      lastSortOrder: false,
+      layoutCSSMap: {
+        "alignment": {
+          "vertical": "is-inline-block",
+          "horizontal": "is-flex"
+        }
+      }
     }
   },
-  i18n: { 
+  i18n: {
     locale: this.currentLanguage,
     messages: gcMessagesLocales
   },
@@ -159,7 +183,7 @@ Vue.component('gc-messages', {
   /* when vue component is mounted (ready) on DOM node */
   mounted: function () {
     console.debug("messages! - mounted()");
-    
+
     try {
       this.changeLanguage();
     } catch (ex) {}
@@ -168,26 +192,26 @@ Vue.component('gc-messages', {
   computed: {
     apiKey: {
       get: function () {
-          return this.gcApikey;
+        return this.gcApikey;
       }
     },
     apiHost: {
-        get: function () {
-            return this.gcHost;
-        }
+      get: function () {
+        return this.gcHost;
+      }
     },
     apiBaseUrl: {
-        get: function () {
-            return this.gcApiBaseUrl;
+      get: function () {
+        return this.gcApiBaseUrl;
       }
     },
     apiSecure: {
       get: function () {
-          return this.gcApiSecure;
+        return this.gcApiSecure;
       }
     },
     apiMajorVersion: {
-      get () {
+      get() {
         if (this.apiBaseUrl === "/agknow/api/v3") {
           return 3
         }
@@ -197,17 +221,17 @@ Vue.component('gc-messages', {
       }
     },
     selectedParcelId: {
-      get: function () { 
+      get: function () {
         return this.gcSelectedParcelId;
       }
     },
     availableOptions: {
-      get: function() {
+      get: function () {
         return (this.gcAvailableOptions.split(","));
       }
     },
     currentLanguage: {
-      get: function() {
+      get: function () {
         // will always reflect prop's value 
         return this.gcLanguage;
       },
@@ -219,17 +243,17 @@ Vue.component('gc-messages', {
     },
     selectedParcelId(newValue, oldValue) {
       //get messages of current parcel
-      if (this.gcWidgetCollapsed == false) {
+      if (this.gcWidgetCollapsed === false) {
         this.getParcelMessages(newValue);
       }
     },
     gcWidgetCollapsed(newValue, oldValue) {
-      if (newValue == false) {
+      if (newValue === false) {
         this.getParcelMessages(this.selectedParcelId);
       }
     }
   },
-  methods: {  
+  methods: {
     getApiUrl: function (endpoint) {
       /* handles requests directly against  geocledian endpoints with API keys
           or (if gcProxy is set)
@@ -245,11 +269,11 @@ Vue.component('gc-messages', {
       // if (this.apiEncodeParams) {
       //   endpoint = encodeURIComponent(endpoint);
       // }
-      
+
       // with or without apikey depending on gcProxy property
-      return (this.gcProxy ? 
-                protocol + '://' + this.gcProxy + this.apiBaseUrl + endpoint  : 
-                protocol + '://' + this.gcHost + this.apiBaseUrl + endpoint + "?key="+this.apiKey);
+      return (this.gcProxy ?
+        protocol + '://' + this.gcProxy + this.apiBaseUrl + endpoint :
+        protocol + '://' + this.gcHost + this.apiBaseUrl + endpoint + "?key=" + this.apiKey);
     },
     getParcelMessages(parcel_id) {
 
@@ -262,13 +286,13 @@ Vue.component('gc-messages', {
       //Show requests on the DEBUG console for developers
       console.debug("getParcelMessages()");
       console.debug("GET " + this.getApiUrl(endpoint));
-      
+
       // Axios implement start
       axios({
         method: 'GET',
         url: this.getApiUrl(endpoint),
       }).then(function (response) {
-        if(response.status === 200){
+        if (response.status === 200) {
           var tmp = response.data;
 
           let obj;
@@ -286,7 +310,7 @@ Vue.component('gc-messages', {
             console.debug(tmp);
 
             this.messages = tmp.content;
-            
+
           }
         } else {
           console.log(response)
@@ -303,26 +327,25 @@ Vue.component('gc-messages', {
       this.$i18n.locale = this.currentLanguage;
     },
     sortByAttribute: function (attribute) {
-      console.debug("sorting by "+ attribute);
+      console.debug("sorting by " + attribute);
 
       this.lastSortOrder = !this.lastSortOrder;
 
       // don't sort with operators - function must return -1 or 1
-      this.messages.sort( function (a,b) {
+      this.messages.sort(function (a, b) {
         if (this.lastSortOrder) {
           // check for object type, if so sort as string
           if (a[attribute] === Object(a[attribute])) {
-            return JSON.stringify(a[attribute]) > JSON.stringify(b[attribute]) ? -1 : JSON.stringify(a[attribute]) < JSON.stringify(b[attribute]) ?  1 : 0 
+            return JSON.stringify(a[attribute]) > JSON.stringify(b[attribute]) ? -1 : JSON.stringify(a[attribute]) < JSON.stringify(b[attribute]) ? 1 : 0
           } else {
-            return a[attribute] > b[attribute] ? -1 : a[attribute] < b[attribute] ?  1 : 0 
+            return a[attribute] > b[attribute] ? -1 : a[attribute] < b[attribute] ? 1 : 0
           }
-        }
-        else {
+        } else {
           // check for object type, if so sort as string
           if (a[attribute] === Object(a[attribute])) {
-            return JSON.stringify(a[attribute]) > JSON.stringify(b[attribute]) ? 1 : JSON.stringify(a[attribute]) < JSON.stringify(b[attribute]) ?  -1 : 0
+            return JSON.stringify(a[attribute]) > JSON.stringify(b[attribute]) ? 1 : JSON.stringify(a[attribute]) < JSON.stringify(b[attribute]) ? -1 : 0
           } else {
-            return a[attribute] > b[attribute] ? 1 : a[attribute] < b[attribute] ?  -1 : 0
+            return a[attribute] > b[attribute] ? 1 : a[attribute] < b[attribute] ? -1 : 0
           }
         }
       }.bind(this));
